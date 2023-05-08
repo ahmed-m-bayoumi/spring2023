@@ -1,0 +1,46 @@
+% Load the AAL atlas
+aal = spm_vol('AAL3v1.nii');
+[atlas, XYZ] = spm_read_vols(aal);
+
+% Create a binary mask for the left hippocampus (label 37) and right hippocampus (label 38)
+hippocampus_mask = (atlas == 37) | (atlas == 38);
+
+% Save the hippocampus mask as a NIfTI file
+hippocampus_mask_nii = aal;
+hippocampus_mask_nii.fname = 'hippocampus_mask.nii';
+spm_write_vol(hippocampus_mask_nii, hippocampus_mask);
+
+% Define the seed region using a mask or atlas
+% Assuming 'seed_mask' is a 3D binary matrix (x, y, z) with 1's for voxels in the seed region and 0's elsewhere
+% You can create this mask based on MNI coordinates or using an anatomical atlas
+
+% Extract the time series for the seed region
+seed_mask = hippocampus_mask;
+
+seed_voxels = find(seed_mask);
+num_seed_voxels = numel(seed_voxels);
+seed_time_series = zeros(num_seed_voxels, t);
+
+% Batch processing:
+
+subjects = [01]; % Replace with a list of all of the subjects you wish to analyze
+                                         % note: subj_05 is removed
+feature_matrix = [];
+
+numComponents = 3;
+
+for subject=subjects
+tic
+    subject = num2str(subject, '%02d');
+
+    % Load NIfTI files
+    func_filename = ['C:\Users\ahmed\OneDrive - Texas Tech University\Documents\MATLAB Drive\ECE 5332 Data Science\Project\RawData\DATI\AD\subj_' subject '\warsubj_' subject '_functional.nii'];
+
+    % Read NIFTI files
+    V = niftiread(func_filename);
+    , score, ~, ~, explained, ~] = pca(nifti_data);
+
+toc
+%     feature = score(:, 1);
+%     feature_matrix = [feature_matrix, feature];
+end
